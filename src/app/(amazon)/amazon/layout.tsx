@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
-import { AMAZON_TAB_TITLE } from "@/lib/metadata/store-tab-title";
+import {
+  AMAZON_DESCRIPTION,
+  AMAZON_TAB_TITLE,
+  FAVICON,
+} from "@/lib/metadata/site-metadata";
 
-export const metadata: Metadata = { title: AMAZON_TAB_TITLE };
+export const metadata: Metadata = {
+  title: AMAZON_TAB_TITLE,
+  description: AMAZON_DESCRIPTION,
+  icons: {
+    icon: [{ url: FAVICON.amazon, type: "image/svg+xml" }],
+    shortcut: FAVICON.amazon,
+  },
+};
 
-export default function AmazonLegacyLayout({
+export default function AmazonLayout({
   children,
 }: {
   children: React.ReactNode;

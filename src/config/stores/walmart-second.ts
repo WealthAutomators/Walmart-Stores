@@ -1,3 +1,4 @@
+import { getWalmartInsightsPath } from "@/lib/navigation/routes";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const walmartSecondConfig: StoreConfig = {
@@ -19,7 +20,9 @@ export const walmartSecondConfig: StoreConfig = {
   },
   defaultDateRange: { start: "2024-05-01", end: "2026-05-14" },
   regionLabel: "United States",
-  routes: { home: "/store/walmart-second/analytics/sales-insights" },
+  routes: {
+    home: getWalmartInsightsPath("walmart-second", "account-sales"),
+  },
   topNav: {
     searchPlaceholder: "Try searching for Order",
     messageBadge: 2,

@@ -25,6 +25,7 @@ function NavContent({
   const isInsightsRoute =
     pathname.startsWith(insightsBase) ||
     pathname.includes("/analytics/sales-insights") ||
+    pathname.includes("/analytics/accounts/") ||
     pathname.includes("/analytics/search-insights");
 
   return (

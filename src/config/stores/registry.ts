@@ -5,6 +5,8 @@ import { walmartMainConfig } from "@/config/stores/walmart-main";
 import { walmartSecondConfig } from "@/config/stores/walmart-second";
 import type { StoreConfig, StoreId } from "@/config/stores/types";
 
+export { getStorePath } from "@/lib/navigation/routes";
+
 const STORE_MAP: Record<StoreId, StoreConfig> = {
   "amazon-chokebody": amazonChokebodyConfig,
   "amazon-apex": amazonApexConfig,
@@ -26,8 +28,4 @@ export function getStoreConfig(storeId: string): StoreConfig {
     throw new Error(`Unknown store: ${storeId}`);
   }
   return STORE_MAP[storeId];
-}
-
-export function getStorePath(storeId: StoreId, path: string): string {
-  return `/store/${storeId}${path}`;
 }

@@ -1,3 +1,4 @@
+import { getAmazonSalesDashboardPath } from "@/lib/navigation/routes";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const amazonChokebodyConfig: StoreConfig = {
@@ -21,7 +22,7 @@ export const amazonChokebodyConfig: StoreConfig = {
   },
   defaultDateRange: { start: "2024-05-16", end: "2026-05-15" },
   regionLabel: "United States",
-  routes: { home: "/store/amazon-chokebody/dashboard/sales" },
+  routes: { home: getAmazonSalesDashboardPath("amazon-chokebody") },
   dashboard: {
     asinTitle: "Deep dive into your sales",
     asinComparisonLabel: "Compared to prior week (May 4 – May 10, 2024)",

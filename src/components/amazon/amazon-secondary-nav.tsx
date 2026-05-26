@@ -27,7 +27,9 @@ export function AmazonSecondaryNav() {
   const { setMobileOpen } = useSidebar();
 
   const isReportsRoute =
-    pathname.includes("/dashboard/") || pathname.includes("/reports/");
+    pathname.includes("/business-reports/") ||
+    pathname.includes("/dashboard/") ||
+    pathname.includes("/reports/");
 
   return (
     <nav className="flex h-8 items-center gap-0 border-b border-white/10 bg-topnav px-2 text-[11px] text-white sm:px-3">

@@ -1,5 +1,6 @@
-import { AmazonReportContent } from "@/components/dashboard/amazon-report-content";
+import { redirect } from "next/navigation";
+import { getDefaultAmazonHomePath } from "@/lib/navigation/routes";
 
-export default function SalesDashboardPage() {
-  return <AmazonReportContent title="Sales Dashboard" showAsinCarousel />;
+export default function LegacyAmazonSalesDashboardPage() {
+  redirect(getDefaultAmazonHomePath());
 }

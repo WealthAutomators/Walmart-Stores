@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
-import { WALMART_TAB_TITLE } from "@/lib/metadata/store-tab-title";
+import {
+  FAVICON,
+  WALMART_DESCRIPTION,
+  WALMART_TAB_TITLE,
+} from "@/lib/metadata/site-metadata";
 
-export const metadata: Metadata = { title: WALMART_TAB_TITLE };
+export const metadata: Metadata = {
+  title: WALMART_TAB_TITLE,
+  description: WALMART_DESCRIPTION,
+  icons: {
+    icon: [{ url: FAVICON.walmart, type: "image/svg+xml" }],
+    shortcut: FAVICON.walmart,
+  },
+};
 
-export default function WalmartLegacyLayout({
+export default function WalmartLayout({
   children,
 }: {
   children: React.ReactNode;

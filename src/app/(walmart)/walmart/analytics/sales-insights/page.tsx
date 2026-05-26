@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
+import { getDefaultWalmartHomePath } from "@/lib/navigation/routes";
 
-export default function WalmartSalesInsightsLegacyPage() {
-  redirect("/store/walmart-main/analytics/sales-insights");
+export default function LegacyWalmartInsightsPage() {
+  redirect(getDefaultWalmartHomePath());
 }

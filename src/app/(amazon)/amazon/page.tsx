@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
+import { getDefaultAmazonHomePath } from "@/lib/navigation/routes";
 
-export default function AmazonIndexPage() {
-  redirect("/amazon/dashboard/sales");
+export default function LegacyAmazonIndexPage() {
+  redirect(getDefaultAmazonHomePath());
 }

@@ -15,30 +15,34 @@ import {
 } from "@/components/ui/select";
 import { useDemoAuth } from "@/components/providers/demo-auth-provider";
 import { SurfaceCard } from "@/components/shared/surface-card";
+import {
+  getDefaultAmazonHomePath,
+  getDefaultWalmartHomePath,
+} from "@/lib/navigation/routes";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useDemoAuth();
-  const [email, setEmail] = useState("demo@seller-analytics.local");
+  const [email, setEmail] = useState("");
   const [marketplace, setMarketplace] = useState<"amazon" | "walmart">("amazon");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, marketplace);
+    login(email || "seller@company.internal", marketplace);
     router.push(
       marketplace === "amazon"
-        ? "/amazon/dashboard/sales"
-        : "/walmart/analytics/sales-insights"
+        ? getDefaultAmazonHomePath()
+        : getDefaultWalmartHomePath()
     );
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-page p-4">
       <SurfaceCard className="w-full max-w-md">
-        <h1 className="mb-2 text-2xl font-bold">Demo sign in</h1>
+        <h1 className="mb-2 text-2xl font-bold">Sign in</h1>
         <p className="mb-6 text-sm text-muted-foreground">
-          Any credentials work. This is a mock authentication flow for
-          presentations only.
+          Access your marketplace analytics workspace with your organization
+          credentials.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -46,6 +50,7 @@ export default function LoginPage() {
             <Input
               id="email"
               type="email"
+              placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -60,8 +65,8 @@ export default function LoginPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="amazon">Amazon</SelectItem>
-                <SelectItem value="walmart">Walmart</SelectItem>
+                <SelectItem value="amazon">Amazon Seller Central</SelectItem>
+                <SelectItem value="walmart">Walmart Seller Center</SelectItem>
               </SelectContent>
             </Select>
           </div>

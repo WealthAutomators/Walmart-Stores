@@ -1,3 +1,4 @@
+import { getAmazonSalesDashboardPath } from "@/lib/navigation/routes";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const amazonApexConfig: StoreConfig = {
@@ -21,7 +22,7 @@ export const amazonApexConfig: StoreConfig = {
   },
   defaultDateRange: { start: "2024-05-15", end: "2026-05-14" },
   regionLabel: "United States",
-  routes: { home: "/store/amazon-apex/dashboard/sales" },
+  routes: { home: getAmazonSalesDashboardPath("amazon-apex") },
   dashboard: {
     asinTitle: "Deep dive into your sales",
     defaultAsinCategory: "growth_opportunities",

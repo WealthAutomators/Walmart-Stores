@@ -28,8 +28,8 @@ export default function HomePage() {
           Marketplace analytics
         </h2>
         <p className="mb-12 max-w-2xl text-[#565959]">
-          Choose a seller environment to view sales performance, reports, and
-          insights. Each store has independent metrics and branding.
+          Choose a seller account to open business reports, sales dashboards, and
+          marketplace performance insights.
         </p>
         <div className="grid gap-6 sm:grid-cols-2">
           {ALL_STORES.map((store) => (

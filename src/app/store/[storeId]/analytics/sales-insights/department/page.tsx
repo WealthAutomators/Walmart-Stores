@@ -1,5 +1,18 @@
-import { WalmartInsightsPage } from "@/components/engine/walmart-insights-page";
+import { redirect } from "next/navigation";
+import { isValidStoreId } from "@/config/stores/registry";
+import { getWalmartInsightsPath } from "@/lib/navigation/routes";
+import type { StoreId } from "@/config/stores/types";
 
-export default function StoreDepartmentSalesPage() {
-  return <WalmartInsightsPage activeTab="department" />;
+export default async function LegacyWalmartDepartmentInsightsRedirect({
+  params,
+}: {
+  params: Promise<{ storeId: string }>;
+}) {
+  const { storeId } = await params;
+  if (!isValidStoreId(storeId)) {
+    redirect("/");
+  }
+  redirect(
+    getWalmartInsightsPath(storeId as StoreId, "department-performance")
+  );
 }

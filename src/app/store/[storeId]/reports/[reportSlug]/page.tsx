@@ -1,21 +1,16 @@
-import { AmazonDashboardPage } from "@/components/engine/amazon-dashboard-page";
+import { redirect } from "next/navigation";
+import { isValidStoreId } from "@/config/stores/registry";
+import { getAmazonReportPath } from "@/lib/navigation/routes";
+import type { StoreId } from "@/config/stores/types";
 
-const REPORT_TITLES: Record<string, string> = {
-  "sales-traffic": "Sales and Traffic",
-  "detail-page-sales": "Detail Page Sales and Traffic",
-  "seller-performance": "Seller Performance",
-  "detail-page-asin": "Detail Page Sales and Traffic",
-  "detail-page-parent": "Detail Page Sales and Traffic By Parent Item",
-  "detail-page-child": "Detail Page Sales and Traffic By Child Item",
-  "sales-orders-month": "Sales and Orders by Month",
-};
-
-export default async function StoreReportPage({
+export default async function LegacyAmazonReportRedirect({
   params,
 }: {
-  params: Promise<{ reportSlug: string }>;
+  params: Promise<{ storeId: string; reportSlug: string }>;
 }) {
-  const { reportSlug } = await params;
-  const title = REPORT_TITLES[reportSlug] ?? "Business Report";
-  return <AmazonDashboardPage title={title} />;
+  const { storeId, reportSlug } = await params;
+  if (!isValidStoreId(storeId)) {
+    redirect("/");
+  }
+  redirect(getAmazonReportPath(storeId as StoreId, reportSlug));
 }

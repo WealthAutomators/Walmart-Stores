@@ -29,6 +29,7 @@ const SidebarContext = createContext<SidebarContextValue | null>(null);
 function isWalmartPath(pathname: string): boolean {
   return (
     pathname.startsWith("/walmart") ||
+    pathname.startsWith("/analytics") ||
     pathname.includes("/store/walmart-")
   );
 }

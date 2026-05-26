@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
+import { rootPlatformMetadata } from "@/lib/metadata/site-metadata";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,14 +9,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Seller Center",
-    template: "%s",
-  },
-  description:
-    "Demonstration ecommerce seller analytics dashboard — not affiliated with Amazon or Walmart.",
-};
+export const metadata: Metadata = rootPlatformMetadata;
 
 export default function RootLayout({
   children,

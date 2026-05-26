@@ -1,3 +1,4 @@
+import { getAmazonSalesDashboardPath } from "@/lib/navigation/routes";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const amazonNovaConfig: StoreConfig = {
@@ -21,7 +22,7 @@ export const amazonNovaConfig: StoreConfig = {
   },
   defaultDateRange: { start: "2024-08-14", end: "2026-05-15" },
   regionLabel: "United States",
-  routes: { home: "/store/amazon-nova/dashboard/sales" },
+  routes: { home: getAmazonSalesDashboardPath("amazon-nova") },
   dashboard: {
     asinTitle: "Deep dive your ASIN performance",
     asinComparisonLabel:

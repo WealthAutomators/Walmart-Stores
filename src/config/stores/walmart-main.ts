@@ -1,3 +1,4 @@
+import { getWalmartInsightsPath } from "@/lib/navigation/routes";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const walmartMainConfig: StoreConfig = {
@@ -19,5 +20,7 @@ export const walmartMainConfig: StoreConfig = {
   },
   defaultDateRange: { start: "2024-01-01", end: "2026-05-14" },
   regionLabel: "United States",
-  routes: { home: "/store/walmart-main/analytics/sales-insights" },
+  routes: {
+    home: getWalmartInsightsPath("walmart-main", "account-sales"),
+  },
 };
