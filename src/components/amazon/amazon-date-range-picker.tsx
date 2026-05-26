@@ -38,6 +38,11 @@ interface AmazonDateRangePickerProps {
 
 type ActiveField = "start" | "end" | null;
 
+const FIELD_HELPER_TEXT = {
+  start: "Select start date — earlier dates are excluded from the range",
+  end: "Select end date — earlier dates are excluded from the range",
+} as const;
+
 function toIso(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }
@@ -58,6 +63,18 @@ const dayPickerClassNames = {
   today: "[&>button]:font-bold",
 } as const;
 
+const calendarModifiersClassNames = {
+  beforeAnchor: "rdp-day-before-anchor",
+};
+
+function getAnchorDate(range: DateRange, field: "start" | "end"): Date {
+  return parseISO(field === "start" ? range.start : range.end);
+}
+
+function beforeAnchorModifier(anchorDay: Date) {
+  return (date: Date) => isBefore(startOfDay(date), anchorDay);
+}
+
 export function AmazonDateRangePicker({
   preset,
   range,
@@ -67,26 +84,24 @@ export function AmazonDateRangePicker({
   const [activeField, setActiveField] = useState<ActiveField>(null);
   const [openField, setOpenField] = useState<ActiveField>(null);
 
-  const anchorEnd = parseISO(range.end);
-  const anchorEndDay = startOfDay(anchorEnd);
-
-  const handleDayClick = (date: Date | undefined) => {
+  const handleDayClick = (date: Date | undefined, field: "start" | "end") => {
     if (!date) return;
-    const nextEnd = toIso(date);
     const clickedDay = startOfDay(date);
-    const currentStart = parseISO(range.start);
-    const nextStart = isAfter(currentStart, clickedDay) ? nextEnd : range.start;
-    onRangeChange({ start: nextStart, end: nextEnd });
+    const clickedIso = toIso(date);
+
+    if (field === "start") {
+      const currentEnd = parseISO(range.end);
+      const nextEnd = isAfter(clickedDay, currentEnd) ? clickedIso : range.end;
+      onRangeChange({ start: clickedIso, end: nextEnd });
+    } else {
+      const currentStart = parseISO(range.start);
+      const nextStart = isBefore(clickedDay, currentStart)
+        ? clickedIso
+        : range.start;
+      onRangeChange({ start: nextStart, end: clickedIso });
+    }
+
     onPresetChange("custom");
-  };
-
-  const calendarModifiers = {
-    beforeAnchor: (date: Date) =>
-      isBefore(startOfDay(date), anchorEndDay),
-  };
-
-  const calendarModifiersClassNames = {
-    beforeAnchor: "rdp-day-before-anchor",
   };
 
   return (
@@ -116,6 +131,8 @@ export function AmazonDateRangePicker({
             field === "start"
               ? formatDisplayDate(range.start)
               : formatDisplayDate(range.end);
+          const anchorDate = getAnchorDate(range, field);
+          const anchorDay = startOfDay(anchorDate);
 
           return (
             <Popover
@@ -148,16 +165,19 @@ export function AmazonDateRangePicker({
                 sideOffset={4}
               >
                 <DayPicker
+                  key={field}
                   mode="single"
-                  selected={anchorEnd}
-                  onSelect={handleDayClick}
-                  defaultMonth={anchorEnd}
-                  modifiers={calendarModifiers}
+                  selected={anchorDate}
+                  onSelect={(date) => handleDayClick(date, field)}
+                  defaultMonth={anchorDate}
+                  modifiers={{
+                    beforeAnchor: beforeAnchorModifier(anchorDay),
+                  }}
                   modifiersClassNames={calendarModifiersClassNames}
                   classNames={dayPickerClassNames}
                 />
                 <p className="border-t border-[#d5d9d9] px-3 py-2 text-[11px] text-[#565959]">
-                  Select end date — earlier dates are excluded from view
+                  {FIELD_HELPER_TEXT[field]}
                 </p>
               </PopoverContent>
             </Popover>

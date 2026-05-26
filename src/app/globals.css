@@ -113,13 +113,14 @@
 }
 
 .amazon-day-picker .rdp-day-before-anchor .rdp-day_button {
-  color: #9ca3af;
-  opacity: 0.45;
-  background-color: #f3f5f6;
+  color: #6b7280;
+  background-color: #eef1f3;
+  opacity: 1;
+  cursor: pointer;
 }
 
 .amazon-day-picker .rdp-day-before-anchor .rdp-day_button:hover {
-  background-color: #eef2f4;
+  background-color: #e5e9ec;
 }
 
 .walmart-day-picker .rdp-selected .rdp-day_button,
