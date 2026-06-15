@@ -1,5 +1,5 @@
 import { getWalmartInsightsPath } from "@/lib/navigation/routes";
-import { getRollingDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
+import { getFullHistoryDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const walmartSecondConfig: StoreConfig = {
@@ -19,7 +19,7 @@ export const walmartSecondConfig: StoreConfig = {
     chartAccent: "#7d5ab5",
     chartPurple: "#7659b6",
   },
-  defaultDateRange: getRollingDashboardDateRange(),
+  defaultDateRange: getFullHistoryDashboardDateRange("2024-05-01"),
   regionLabel: "United States",
   routes: {
     home: getWalmartInsightsPath("walmart-second", "account-sales"),

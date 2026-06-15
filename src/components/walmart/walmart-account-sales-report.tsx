@@ -8,8 +8,8 @@ import { WalmartDateRangeModal } from "@/components/walmart/walmart-date-range-m
 import { WalmartSalesChart } from "@/components/walmart/walmart-sales-chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatLongDateRange } from "@/lib/format-date";
+import { getFullHistoryDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
 import { useStoreOverridesVersion } from "@/hooks/use-store-overrides-version";
-import { getRollingDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
 import { getMetricLabel, getWalmartInsights } from "@/services/store-analytics.service";
 import type { StoreId } from "@/config/stores/types";
 import type { WalmartMetricKey, WalmartSalesInsightsResponse } from "@/types/walmart";
@@ -17,18 +17,16 @@ import type { DateRange, ReportFilters } from "@/types/common";
 
 interface WalmartAccountSalesReportProps {
   storeId: string;
-  /** Ignored — dashboard always opens on the rolling last-30-days window. */
   defaultDateRange?: DateRange;
 }
 
 export function WalmartAccountSalesReport({
   storeId,
+  defaultDateRange = getFullHistoryDashboardDateRange("2024-01-01"),
 }: WalmartAccountSalesReportProps) {
   const [activeMetric, setActiveMetric] = useState<WalmartMetricKey>("gmv");
   const [data, setData] = useState<WalmartSalesInsightsResponse | null>(null);
-  const [appliedRange, setAppliedRange] = useState<DateRange>(
-    getRollingDashboardDateRange
-  );
+  const [appliedRange, setAppliedRange] = useState<DateRange>(defaultDateRange);
   const [dateModalOpen, setDateModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const overridesVersion = useStoreOverridesVersion(storeId as StoreId);

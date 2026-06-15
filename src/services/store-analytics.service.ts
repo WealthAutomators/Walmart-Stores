@@ -1,6 +1,5 @@
 import { MOCK_API_DELAY_MS } from "@/lib/constants";
-import { isValidStoreId } from "@/config/stores/registry";
-import { getRollingDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
+import { getStoreConfig, isValidStoreId } from "@/config/stores/registry";
 import type { StoreId } from "@/config/stores/types";
 import {
   applyIncrementToAmazonAggregate,
@@ -47,24 +46,6 @@ function applySalesBreakdownToSeries(
     unitsOrdered: Math.round(p.unitsOrdered * mult),
     orderedProductSales: Math.round(p.orderedProductSales * mult * 100) / 100,
   }));
-}
-
-function scaleAggregate(
-  aggregate: CompareSalesAggregate,
-  multiplier: number
-): CompareSalesAggregate {
-  if (multiplier === 1) return aggregate;
-  return {
-    ...aggregate,
-    label: aggregate.label,
-    totalOrderItems: Math.round(aggregate.totalOrderItems * multiplier),
-    unitsOrdered: Math.round(aggregate.unitsOrdered * multiplier),
-    orderedProductSales:
-      Math.round(aggregate.orderedProductSales * multiplier * 100) / 100,
-    avgUnitsPerOrderItem: aggregate.avgUnitsPerOrderItem,
-    avgSalesPerOrderItem:
-      Math.round(aggregate.avgSalesPerOrderItem * multiplier * 100) / 100,
-  };
 }
 
 function delay(ms: number = MOCK_API_DELAY_MS): Promise<void> {
@@ -157,14 +138,8 @@ export async function getAmazonDashboard(
   const timeSeries = filterSeries(fullSeries, filters.range);
 
   const computedAggregate = aggregateFromSeries(timeSeries);
-  const defaultAggregate = bundle.config.defaultAggregate;
-  const filterScale =
-    fulfillmentMultipliers[filters.fulfillment] *
-    salesBreakdownMultipliers[filters.salesBreakdown];
 
-  let baseAggregate = defaultAggregate
-    ? scaleAggregate(defaultAggregate, filterScale)
-    : computedAggregate;
+  let baseAggregate = computedAggregate;
 
   const kpiIncrement = computeRecentAnalyticsKpiIncrement(
     storeId as StoreId,
@@ -225,10 +200,10 @@ export async function getWalmartInsights(
       ? Math.round((computedSummary.gmv / computedSummary.unitsSold) * 100) / 100
       : 0;
 
-  const rollingDefault = getRollingDashboardDateRange();
+  const storeDefaultRange = getStoreConfig(storeId as StoreId).defaultDateRange;
   const isDefaultRange =
-    filters.range.start === rollingDefault.start &&
-    filters.range.end === rollingDefault.end;
+    filters.range.start === storeDefaultRange.start &&
+    filters.range.end === storeDefaultRange.end;
 
   const allOverrides = loadStoreOverrides(storeId);
   const overrides = allOverrides?.walmart;

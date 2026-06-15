@@ -18,3 +18,14 @@ export function getRollingDashboardDateRange(
     end: format(asOf, "yyyy-MM-dd"),
   };
 }
+
+/** Full store history from a fixed start date through today. */
+export function getFullHistoryDashboardDateRange(
+  startDate: string,
+  asOf: Date = new Date()
+): DateRange {
+  return {
+    start: startDate,
+    end: format(asOf, "yyyy-MM-dd"),
+  };
+}

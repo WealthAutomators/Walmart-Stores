@@ -12,9 +12,10 @@ import type {
 function createDefaultFilters(
   initial?: Partial<ReportFilters>
 ): ReportFilters {
+  const hasCustomRange = Boolean(initial?.range);
   return {
-    preset: "30d",
-    range: getRollingDashboardDateRange(),
+    preset: hasCustomRange ? "custom" : "30d",
+    range: initial?.range ?? getRollingDashboardDateRange(),
     fulfillment: "both",
     salesBreakdown: "marketplace_total",
     ...initial,

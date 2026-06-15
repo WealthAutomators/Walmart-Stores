@@ -58,6 +58,8 @@ export function AmazonDashboardPage({
     updateSalesBreakdown,
     applyFilters,
   } = useReportFilters({
+    range: config.defaultDateRange,
+    preset: "custom",
     salesBreakdown: "marketplace_total",
   });
 

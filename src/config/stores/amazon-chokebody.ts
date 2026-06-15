@@ -1,5 +1,5 @@
 import { getAmazonSalesDashboardPath } from "@/lib/navigation/routes";
-import { getRollingDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
+import { getFullHistoryDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
 import type { StoreConfig } from "@/config/stores/types";
 
 export const amazonChokebodyConfig: StoreConfig = {
@@ -21,12 +21,12 @@ export const amazonChokebodyConfig: StoreConfig = {
     sidebarBg: "#f0f2f2",
     chartAccent: "#008296",
   },
-  defaultDateRange: { start: "2024-05-16", end: getRollingDashboardDateRange().end },
+  defaultDateRange: getFullHistoryDashboardDateRange("2024-05-16"),
   regionLabel: "United States",
   routes: { home: getAmazonSalesDashboardPath("amazon-chokebody") },
   dashboard: {
     asinTitle: "Deep dive into your sales",
-    asinComparisonLabel: "Compared to prior week (June 2 – June 8, 2026)",
+    asinComparisonLabel: "Compared to prior week (June 8 – June 14, 2026)",
     defaultAsinCategory: "declining_sales",
     asinLayout: "carousel",
   },

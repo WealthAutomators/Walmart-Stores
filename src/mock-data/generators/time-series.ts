@@ -92,6 +92,53 @@ function reconcileWalmartTargetGmv(
   return result;
 }
 
+function applyDerivedWalmartPoint(
+  point: DailyMetricPoint,
+  gmv: number,
+  rand: () => number
+): DailyMetricPoint {
+  const units = Math.max(0, Math.round(gmv / (8 + rand() * 4)));
+  const orders = Math.max(0, Math.round(units * (0.85 + rand() * 0.1)));
+  return {
+    date: point.date,
+    gmv: Math.round(gmv * 100) / 100,
+    unitsSold: units,
+    orders,
+    aur: units > 0 ? Math.round((gmv / units) * 100) / 100 : 0,
+  };
+}
+
+/** Distribute extra GMV across the last 5 days, weighted toward the spike day. */
+function applyWalmartTailTotalUplift(
+  points: DailyMetricPoint[],
+  seed: number,
+  upliftPercent = 0.1
+): DailyMetricPoint[] {
+  const tailDays = 5;
+  if (points.length < tailDays) return points;
+
+  const result = points.map((p) => ({ ...p }));
+  const tailStart = result.length - tailDays;
+  const tailSum = result
+    .slice(tailStart)
+    .reduce((sum, point) => sum + point.gmv, 0);
+  const extraTotal = tailSum * upliftPercent;
+  const weights = [0.15, 0.15, 0.35, 0.2, 0.15];
+  const rand = mulberry32(seed + 99);
+
+  for (let day = 0; day < tailDays; day++) {
+    const idx = tailStart + day;
+    const extra = extraTotal * weights[day];
+    result[idx] = applyDerivedWalmartPoint(
+      result[idx],
+      result[idx].gmv + extra,
+      rand
+    );
+  }
+
+  return result;
+}
+
 function finishWalmartSeries(
   points: DailyMetricPoint[],
   options: GenerateTimeSeriesOptions
@@ -101,9 +148,15 @@ function finishWalmartSeries(
     seed,
     profile: walmartProfileToGrowthProfile(options.walmartTimeSeriesProfile),
   });
+
+  if (options.walmartTimeSeriesProfile === "spike-collapse") {
+    return applyWalmartTailTotalUplift(grown, seed);
+  }
+
   if (options.walmartTimeSeriesProfile === "volatile-bursts") {
     return reconcileWalmartTargetGmv(grown, options.targetSales, seed);
   }
+
   return grown;
 }
 

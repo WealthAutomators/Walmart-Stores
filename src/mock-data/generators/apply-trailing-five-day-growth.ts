@@ -5,6 +5,7 @@ const SEED_OFFSET = 99105;
 
 /** Growth multipliers relative to baseline for each tail day (day 0 = first of last 5). */
 const GROWTH_CURVE = [1.04, 1.065, 1.2, 1.12, 1.08];
+const WALMART_GROWTH_CURVE = [1.06, 1.09, 1.22, 1.14, 1.11];
 
 export type TrailingGrowthProfile =
   | "amazon-apex"
@@ -51,7 +52,7 @@ function resolveBaseline(
   if (useRecoveryFloor) {
     const floor =
       profile === "walmart-main"
-        ? Math.max(p25, 85)
+        ? Math.max(p25, 120)
         : Math.max(p25, 18);
     return Math.max(sevenDayAvg, floor);
   }
@@ -81,7 +82,11 @@ function growthMultiplier(
   rand: () => number,
   profile: TrailingGrowthProfile
 ): number {
-  const base = GROWTH_CURVE[dayOffset] ?? GROWTH_CURVE[GROWTH_CURVE.length - 1];
+  const curve =
+    profile === "walmart-main" || profile === "walmart-second"
+      ? WALMART_GROWTH_CURVE
+      : GROWTH_CURVE;
+  const base = curve[dayOffset] ?? curve[curve.length - 1];
   const noise = profileNoiseScale(profile);
   const spikeBoost = profile === "walmart-main" && dayOffset === 2 ? 0.05 : 0;
   return base * (1 + (rand() - 0.5) * noise + spikeBoost);
@@ -194,7 +199,7 @@ export function applyTrailingFiveDayGrowthWalmart(
     let shapedGmv = baselineGmv * mult;
 
     if (profile === "walmart-main") {
-      shapedGmv = Math.min(150, Math.max(40, shapedGmv));
+      shapedGmv = Math.min(220, Math.max(100, shapedGmv));
     }
 
     const existing = result[idx];
