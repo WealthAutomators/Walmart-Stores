@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format, subDays } from "date-fns";
 import { AmazonDashboardView } from "@/components/engine/amazon-dashboard-view";
 import { useStore } from "@/lib/store/store-context";
+import { getStoreDefaultDateRange } from "@/config/stores/registry";
 import { useReportFilters } from "@/hooks/use-report-filters";
 import { useStoreOverridesVersion } from "@/hooks/use-store-overrides-version";
 import { getResolvedDashboardUi } from "@/lib/store/resolve-dashboard-ui";
@@ -49,6 +50,12 @@ export function AmazonDashboardPage({
       router.replace(config.routes.home);
     }
   }, [config.template, config.routes.home, router]);
+
+  const defaultDateRange = useMemo(
+    () => getStoreDefaultDateRange(storeId),
+    [storeId]
+  );
+
   const {
     draft,
     applied,
@@ -57,11 +64,23 @@ export function AmazonDashboardPage({
     updateFulfillment,
     updateSalesBreakdown,
     applyFilters,
+    setApplied,
   } = useReportFilters({
-    range: config.defaultDateRange,
+    range: defaultDateRange,
     preset: "custom",
     salesBreakdown: "marketplace_total",
   });
+
+  useEffect(() => {
+    setApplied((prev) => ({
+      ...prev,
+      range: defaultDateRange,
+      preset: "custom",
+    }));
+    updateRange(defaultDateRange);
+    updatePreset("custom");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset range when switching stores
+  }, [storeId]);
 
   const [data, setData] = useState<SalesDashboardResponse | null>(null);
   const [isPending, startTransition] = useTransition();

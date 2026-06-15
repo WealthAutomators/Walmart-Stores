@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { WalmartAccountSalesReport } from "@/components/walmart/walmart-account-sales-report";
-import { DEFAULT_WALMART_DATE_RANGE } from "@/lib/constants";
+import { getStoreDefaultDateRange } from "@/config/stores/registry";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -44,7 +44,7 @@ export function WalmartSalesInsightsContent({
       {activeTab === "account" && (
         <WalmartAccountSalesReport
           storeId="walmart-main"
-          defaultDateRange={DEFAULT_WALMART_DATE_RANGE}
+          defaultDateRange={getStoreDefaultDateRange("walmart-main")}
         />
       )}
 

@@ -3,6 +3,8 @@ import { amazonChokebodyConfig } from "@/config/stores/amazon-chokebody";
 import { amazonNovaConfig } from "@/config/stores/amazon-nova";
 import { walmartMainConfig } from "@/config/stores/walmart-main";
 import { walmartSecondConfig } from "@/config/stores/walmart-second";
+import { getFullHistoryDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
+import type { DateRange } from "@/types/common";
 import type { StoreConfig, StoreId } from "@/config/stores/types";
 
 export { getStorePath } from "@/lib/navigation/routes";
@@ -28,4 +30,10 @@ export function getStoreConfig(storeId: string): StoreConfig {
     throw new Error(`Unknown store: ${storeId}`);
   }
   return STORE_MAP[storeId];
+}
+
+/** Full history through today for dashboard charts and KPIs (start from store config). */
+export function getStoreDefaultDateRange(storeId: StoreId): DateRange {
+  const { defaultDateRange } = getStoreConfig(storeId);
+  return getFullHistoryDashboardDateRange(defaultDateRange.start);
 }

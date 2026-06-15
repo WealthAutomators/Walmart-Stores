@@ -1,5 +1,5 @@
 import { MOCK_API_DELAY_MS } from "@/lib/constants";
-import { getStoreConfig, isValidStoreId } from "@/config/stores/registry";
+import { isValidStoreId } from "@/config/stores/registry";
 import type { StoreId } from "@/config/stores/types";
 import {
   applyIncrementToAmazonAggregate,
@@ -200,17 +200,9 @@ export async function getWalmartInsights(
       ? Math.round((computedSummary.gmv / computedSummary.unitsSold) * 100) / 100
       : 0;
 
-  const storeDefaultRange = getStoreConfig(storeId as StoreId).defaultDateRange;
-  const isDefaultRange =
-    filters.range.start === storeDefaultRange.start &&
-    filters.range.end === storeDefaultRange.end;
-
   const allOverrides = loadStoreOverrides(storeId);
   const overrides = allOverrides?.walmart;
-  let summary =
-    isDefaultRange && bundle.config.defaultSummary
-      ? bundle.config.defaultSummary
-      : computedSummary;
+  let summary = computedSummary;
 
   const kpiIncrement = computeRecentAnalyticsKpiIncrement(
     storeId as StoreId,

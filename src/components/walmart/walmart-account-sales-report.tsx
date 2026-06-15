@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { MetricCardRow } from "@/components/dashboard/metric-card-row";
 import { SalesDataTable } from "@/components/tables/sales-data-table";
 import { TableToolbar } from "@/components/tables/table-toolbar";
@@ -8,7 +8,7 @@ import { WalmartDateRangeModal } from "@/components/walmart/walmart-date-range-m
 import { WalmartSalesChart } from "@/components/walmart/walmart-sales-chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatLongDateRange } from "@/lib/format-date";
-import { getFullHistoryDashboardDateRange } from "@/lib/store/rolling-dashboard-range";
+import { getStoreDefaultDateRange } from "@/config/stores/registry";
 import { useStoreOverridesVersion } from "@/hooks/use-store-overrides-version";
 import { getMetricLabel, getWalmartInsights } from "@/services/store-analytics.service";
 import type { StoreId } from "@/config/stores/types";
@@ -17,19 +17,31 @@ import type { DateRange, ReportFilters } from "@/types/common";
 
 interface WalmartAccountSalesReportProps {
   storeId: string;
+  /** Optional history start; defaults to the store config (e.g. 2024-01-01). */
   defaultDateRange?: DateRange;
 }
 
 export function WalmartAccountSalesReport({
   storeId,
-  defaultDateRange = getFullHistoryDashboardDateRange("2024-01-01"),
+  defaultDateRange: defaultDateRangeProp,
 }: WalmartAccountSalesReportProps) {
+  const defaultDateRange = useMemo(
+    () =>
+      defaultDateRangeProp ??
+      getStoreDefaultDateRange(storeId as StoreId),
+    [defaultDateRangeProp, storeId]
+  );
+
   const [activeMetric, setActiveMetric] = useState<WalmartMetricKey>("gmv");
   const [data, setData] = useState<WalmartSalesInsightsResponse | null>(null);
   const [appliedRange, setAppliedRange] = useState<DateRange>(defaultDateRange);
   const [dateModalOpen, setDateModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const overridesVersion = useStoreOverridesVersion(storeId as StoreId);
+
+  useEffect(() => {
+    setAppliedRange(defaultDateRange);
+  }, [defaultDateRange.start, defaultDateRange.end, storeId]);
 
   const fetchData = useCallback(
     (range: DateRange) => {

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { WalmartAccountSalesReport } from "@/components/walmart/walmart-account-sales-report";
-import { getStorePath } from "@/config/stores/registry";
+import { getStoreDefaultDateRange, getStorePath } from "@/config/stores/registry";
 import { useStore } from "@/lib/store/store-context";
 import { cn } from "@/lib/utils";
 
@@ -70,7 +70,7 @@ export function WalmartInsightsPage({ activeTab }: WalmartInsightsPageProps) {
       {activeTab === "account" && (
         <WalmartAccountSalesReport
           storeId={storeId}
-          defaultDateRange={config.defaultDateRange}
+          defaultDateRange={getStoreDefaultDateRange(storeId)}
         />
       )}
 

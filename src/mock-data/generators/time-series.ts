@@ -58,40 +58,6 @@ export function generateAmazonTimeSeries(
   return finishAmazonSeries(generateAmazonBehavioralSeries(options), options);
 }
 
-function reconcileWalmartTargetGmv(
-  points: DailyMetricPoint[],
-  targetGmv: number | undefined,
-  seed: number
-): DailyMetricPoint[] {
-  if (!targetGmv || targetGmv <= 0 || points.length < 12) return points;
-
-  const result = points.map((p) => ({ ...p }));
-  const tailGuard = Math.max(0, result.length - 10);
-  const adjustIdx = Math.min(
-    Math.floor(result.length * 0.72),
-    tailGuard - 1
-  );
-  if (adjustIdx < 0) return result;
-
-  const current = result.reduce((s, p) => s + p.gmv, 0);
-  const drift = Math.round((targetGmv - current) * 100) / 100;
-  if (drift === 0) return result;
-
-  const rand = mulberry32(seed + 31);
-  const adjustedGmv = Math.max(0, result[adjustIdx].gmv + drift);
-  const units = Math.max(0, Math.round(adjustedGmv / (8 + rand() * 4)));
-  const orders = Math.max(0, Math.round(units * (0.85 + rand() * 0.1)));
-  result[adjustIdx] = {
-    date: result[adjustIdx].date,
-    gmv: Math.round(adjustedGmv * 100) / 100,
-    unitsSold: units,
-    orders,
-    aur: units > 0 ? Math.round((adjustedGmv / units) * 100) / 100 : 0,
-  };
-
-  return result;
-}
-
 function applyDerivedWalmartPoint(
   point: DailyMetricPoint,
   gmv: number,
@@ -99,44 +65,45 @@ function applyDerivedWalmartPoint(
 ): DailyMetricPoint {
   const units = Math.max(0, Math.round(gmv / (8 + rand() * 4)));
   const orders = Math.max(0, Math.round(units * (0.85 + rand() * 0.1)));
+  const roundedGmv = Math.round(gmv * 100) / 100;
   return {
     date: point.date,
-    gmv: Math.round(gmv * 100) / 100,
+    gmv: roundedGmv,
     unitsSold: units,
     orders,
-    aur: units > 0 ? Math.round((gmv / units) * 100) / 100 : 0,
+    aur: units > 0 ? Math.round((roundedGmv / units) * 100) / 100 : 0,
   };
 }
 
-/** Distribute extra GMV across the last 5 days, weighted toward the spike day. */
-function applyWalmartTailTotalUplift(
+/** Scale the full series proportionally so total GMV matches targetSales. */
+function reconcileWalmartTargetGmv(
   points: DailyMetricPoint[],
-  seed: number,
-  upliftPercent = 0.1
+  targetGmv: number | undefined,
+  seed: number
 ): DailyMetricPoint[] {
-  const tailDays = 5;
-  if (points.length < tailDays) return points;
+  if (!targetGmv || targetGmv <= 0 || points.length === 0) return points;
 
-  const result = points.map((p) => ({ ...p }));
-  const tailStart = result.length - tailDays;
-  const tailSum = result
-    .slice(tailStart)
-    .reduce((sum, point) => sum + point.gmv, 0);
-  const extraTotal = tailSum * upliftPercent;
-  const weights = [0.15, 0.15, 0.35, 0.2, 0.15];
-  const rand = mulberry32(seed + 99);
+  const current = points.reduce((s, p) => s + p.gmv, 0);
+  if (current <= 0) return points;
 
-  for (let day = 0; day < tailDays; day++) {
-    const idx = tailStart + day;
-    const extra = extraTotal * weights[day];
-    result[idx] = applyDerivedWalmartPoint(
-      result[idx],
-      result[idx].gmv + extra,
+  const rand = mulberry32(seed + 31);
+  const scale = targetGmv / current;
+  const scaled = points.map((p) =>
+    applyDerivedWalmartPoint(p, p.gmv * scale, rand)
+  );
+
+  const drift =
+    Math.round((targetGmv - scaled.reduce((s, p) => s + p.gmv, 0)) * 100) / 100;
+  if (drift !== 0 && scaled.length > 0) {
+    const last = scaled.length - 1;
+    scaled[last] = applyDerivedWalmartPoint(
+      scaled[last],
+      scaled[last].gmv + drift,
       rand
     );
   }
 
-  return result;
+  return scaled;
 }
 
 function finishWalmartSeries(
@@ -149,15 +116,7 @@ function finishWalmartSeries(
     profile: walmartProfileToGrowthProfile(options.walmartTimeSeriesProfile),
   });
 
-  if (options.walmartTimeSeriesProfile === "spike-collapse") {
-    return applyWalmartTailTotalUplift(grown, seed);
-  }
-
-  if (options.walmartTimeSeriesProfile === "volatile-bursts") {
-    return reconcileWalmartTargetGmv(grown, options.targetSales, seed);
-  }
-
-  return grown;
+  return reconcileWalmartTargetGmv(grown, options.targetSales, seed);
 }
 
 export function generateWalmartTimeSeries(

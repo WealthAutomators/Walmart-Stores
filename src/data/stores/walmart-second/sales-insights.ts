@@ -1,5 +1,4 @@
 import { generateWalmartTimeSeries } from "@/mock-data/generators/time-series";
-import { getRecentAnalyticsWindow } from "@/lib/store/recent-analytics-window";
 import { getTodayIso } from "@/lib/store/rolling-dashboard-range";
 import type {
   AccountSalesSummary,
@@ -16,7 +15,7 @@ export const walmartSecondDataConfig: Omit<
   timeSeriesProfile: "volatile-bursts",
   rangeStart: "2024-05-01",
   rangeEnd: "2026-06-15",
-  targetSales: 172000,
+  targetSales: 154977.38,
 };
 
 function buildTableRows(
@@ -59,10 +58,8 @@ function summaryFromPoints(
 }
 
 export function buildWalmartSecondBundle(): WalmartStoreDataBundle {
-  const anchor = getTodayIso();
-  const window = getRecentAnalyticsWindow(anchor);
-  const rangeStart = window.start;
-  const rangeEnd = anchor;
+  const rangeStart = walmartSecondDataConfig.rangeStart;
+  const rangeEnd = getTodayIso();
 
   const points = generateWalmartTimeSeries({
     startDate: rangeStart,

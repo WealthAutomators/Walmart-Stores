@@ -1,5 +1,4 @@
 import { generateWalmartTimeSeries } from "@/mock-data/generators/time-series";
-import { getRecentAnalyticsWindow } from "@/lib/store/recent-analytics-window";
 import { getTodayIso } from "@/lib/store/rolling-dashboard-range";
 import type {
   AccountSalesSummary,
@@ -59,10 +58,8 @@ function summaryFromPoints(
 }
 
 export function buildWalmartMainBundle(): WalmartStoreDataBundle {
-  const anchor = getTodayIso();
-  const window = getRecentAnalyticsWindow(anchor);
-  const rangeStart = window.start;
-  const rangeEnd = anchor;
+  const rangeStart = walmartMainDataConfig.rangeStart;
+  const rangeEnd = getTodayIso();
 
   const points = generateWalmartTimeSeries({
     startDate: rangeStart,
