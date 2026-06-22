@@ -117,7 +117,7 @@ export function generateWalmartSecondSeries(
     const topSepDay = sepPool.slice(0, 1);
 
     const latePool = indicesInProgressRange(dayCount, 0.8, 0.98).filter(
-      (i) => i < dayCount - 5
+      (i) => i < dayCount - 7
     );
     latePool.sort((a, b) => scaledGmvs[b] - scaledGmvs[a]);
     const topLateDays = latePool.slice(0, 15);
@@ -147,7 +147,7 @@ export function generateWalmartSecondSeries(
       scaledGmvs[idx] = 520 + rand() * 420 + wobble;
     });
 
-    // Leave the final 5 days unshaped here — applyTrailingFiveDayGrowthWalmart
+    // Leave the final 7 days unshaped — applyTrailingFiveDayGrowthWalmart
     // shapes them with natural variation instead of a flat ceiling.
 
     flatIndices.forEach((idx) => {
@@ -184,7 +184,7 @@ export function generateWalmartSecondSeries(
 
     scaledGmvs = scaledGmvs.map((g, i) => {
       const capped = Math.max(-180, Math.min(1520, Math.round(g * 100) / 100));
-      if (i >= dayCount - 5) {
+      if (i >= dayCount - 7) {
         return Math.round(g * 100) / 100;
       }
       return capped;

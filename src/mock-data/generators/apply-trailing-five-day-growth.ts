@@ -1,10 +1,10 @@
 import { mulberry32 } from "@/mock-data/generators/random";
 
-const TAIL_DAYS = 5;
+const TAIL_DAYS = 7;
 const SEED_OFFSET = 99105;
 
-/** Growth multipliers relative to baseline for each tail day (day 0 = first of last 5). */
-const WALMART_GROWTH_CURVE = [1.06, 1.09, 1.22, 1.14, 1.11];
+/** Growth multipliers for each of the last 7 days (day 0 = oldest in tail). */
+const WALMART_GROWTH_CURVE = [1.14, 1.22, 1.32, 1.44, 1.52, 1.58, 1.68];
 
 export type TrailingGrowthProfile =
   | "walmart-main"
@@ -52,7 +52,7 @@ function resolveBaseline(
 function profileNoiseScale(profile: TrailingGrowthProfile): number {
   switch (profile) {
     case "walmart-main":
-      return 0.12;
+      return 0.1;
     case "walmart-second":
       return 0.08;
     default:
@@ -61,7 +61,7 @@ function profileNoiseScale(profile: TrailingGrowthProfile): number {
 }
 
 function profileBlend(profile: TrailingGrowthProfile): number {
-  return profile === "walmart-main" ? 0.72 : 0.65;
+  return profile === "walmart-main" ? 0.82 : 0.78;
 }
 
 function growthMultiplier(
@@ -71,7 +71,8 @@ function growthMultiplier(
 ): number {
   const base = WALMART_GROWTH_CURVE[dayOffset] ?? WALMART_GROWTH_CURVE[WALMART_GROWTH_CURVE.length - 1];
   const noise = profileNoiseScale(profile);
-  const spikeBoost = profile === "walmart-main" && dayOffset === 2 ? 0.05 : 0;
+  const spikeBoost =
+    profile === "walmart-main" && dayOffset >= 4 ? 0.08 : dayOffset === 3 ? 0.05 : 0;
   return base * (1 + (rand() - 0.5) * noise + spikeBoost);
 }
 
@@ -121,18 +122,50 @@ export function applyTrailingFiveDayGrowthWalmart(
     let shapedGmv = baselineGmv * mult;
 
     if (profile === "walmart-main") {
-      shapedGmv = Math.min(220, Math.max(100, shapedGmv));
+      shapedGmv = Math.min(520, Math.max(180, shapedGmv));
+    } else if (profile === "walmart-second") {
+      shapedGmv = Math.min(680, Math.max(220, shapedGmv));
     }
 
     const existing = result[idx];
-    const newGmv =
-      existing.gmv * (1 - blend) + shapedGmv * blend;
+    const newGmv = existing.gmv * (1 - blend) + shapedGmv * blend;
 
     result[idx] = applyDerivedWalmartMetrics(
       existing,
       Math.max(0, newGmv),
       rand
     );
+  }
+
+  return result;
+}
+
+/** Ensure the last 7 chart days sit clearly above the prior week (before GMV reconcile). */
+export function boostLastSevenDaysVsPriorWeek(
+  points: WalmartTailPoint[],
+  options: { minRatio?: number; seed?: number }
+): WalmartTailPoint[] {
+  if (points.length < TAIL_DAYS * 2) return points;
+
+  const minRatio = options.minRatio ?? 1.85;
+  const rand = mulberry32((options.seed ?? 42) + 44107);
+  const result = points.map((p) => ({ ...p }));
+  const tailStart = result.length - TAIL_DAYS;
+  const prev7 = result.slice(tailStart - TAIL_DAYS, tailStart);
+  const prevAvg = prev7.reduce((s, p) => s + p.gmv, 0) / TAIL_DAYS;
+  if (prevAvg <= 0) return result;
+
+  for (let d = 0; d < TAIL_DAYS; d++) {
+    const idx = tailStart + d;
+    const progress = (d + 1) / TAIL_DAYS;
+    const targetDaily =
+      prevAvg *
+      minRatio *
+      (0.9 + progress * 0.22) *
+      (0.97 + rand() * 0.06);
+    const existing = result[idx];
+    const blended = Math.max(existing.gmv, targetDaily);
+    result[idx] = applyDerivedWalmartMetrics(existing, blended, rand);
   }
 
   return result;

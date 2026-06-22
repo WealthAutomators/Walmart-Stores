@@ -1,6 +1,7 @@
 import { mulberry32 } from "@/mock-data/generators/random";
 import {
   applyTrailingFiveDayGrowthWalmart,
+  boostLastSevenDaysVsPriorWeek,
   walmartProfileToGrowthProfile,
 } from "@/mock-data/generators/apply-trailing-five-day-growth";
 import { applyWalmartLast90DaysLift } from "@/mock-data/generators/walmart-last-90-days-lift";
@@ -73,12 +74,17 @@ function finishWalmartSeries(
   options: GenerateTimeSeriesOptions
 ): DailyMetricPoint[] {
   const seed = options.seed ?? 42;
+  const profile = walmartProfileToGrowthProfile(options.walmartTimeSeriesProfile);
   const grown = applyTrailingFiveDayGrowthWalmart(points, {
     seed,
-    profile: walmartProfileToGrowthProfile(options.walmartTimeSeriesProfile),
+    profile,
+  });
+  const tailBoosted = boostLastSevenDaysVsPriorWeek(grown, {
+    seed,
+    minRatio: profile === "walmart-main" ? 2.05 : 1.9,
   });
 
-  return reconcileWalmartTargetGmv(grown, options.targetSales, seed);
+  return reconcileWalmartTargetGmv(tailBoosted, options.targetSales, seed);
 }
 
 export function generateWalmartTimeSeries(
