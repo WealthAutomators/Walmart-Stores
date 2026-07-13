@@ -14,8 +14,8 @@ export const walmartMainDataConfig: Omit<
   timeSeriesSeed: 99,
   timeSeriesProfile: "spike-collapse",
   rangeStart: "2024-01-01",
-  rangeEnd: "2026-07-10",
-  targetSales: 332456.07,
+  rangeEnd: "2026-07-13",
+  targetSales: 334118.35,
 };
 
 function buildTableRows(
