@@ -66,7 +66,7 @@ export function generateWalmartSecondSeries(
   const cursor = new Date(start);
   while (cursor <= end) {
     dates.push(toIsoDate(cursor));
-    cursor.setDate(cursor.getDate() + 1);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
 
   const dayCount = dates.length;

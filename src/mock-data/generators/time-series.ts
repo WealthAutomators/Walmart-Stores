@@ -143,7 +143,7 @@ export function generateWalmartTimeSeries(
 
     const gmv = Math.max(0, Math.round(base * 100) / 100);
     rawGmvs.push(gmv);
-    cursor.setDate(cursor.getDate() + 1);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
     dayIndex++;
   }
 
@@ -174,7 +174,7 @@ export function generateWalmartTimeSeries(
       aur: units > 0 ? Math.round((gmv / units) * 100) / 100 : 0,
     });
 
-    outCursor.setDate(outCursor.getDate() + 1);
+    outCursor.setUTCDate(outCursor.getUTCDate() + 1);
     dayIndex++;
   }
 

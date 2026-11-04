@@ -1,7 +1,9 @@
+import { parseISO } from "date-fns";
+
 export type ChartPoint = { date: string; value: number };
 
 function toMs(date: string): number {
-  return new Date(date).getTime();
+  return parseISO(date).getTime();
 }
 
 /** Largest-Triangle-Three-Buckets style downsampling for line/area charts */

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import * as echarts from "echarts";
+import { parseISO } from "date-fns";
 import type { EChartsOption } from "echarts";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDisplayDate } from "@/lib/format-date";
@@ -40,7 +41,7 @@ export interface EnterpriseTimeSeriesChartProps {
 }
 
 function toSeriesData(points: ChartPoint[]): [number, number][] {
-  return points.map((p) => [new Date(p.date).getTime(), p.value]);
+  return points.map((p) => [parseISO(p.date).getTime(), p.value]);
 }
 
 function formatYValue(
@@ -77,13 +78,13 @@ export function EnterpriseTimeSeriesChart({
   const seriesData = useMemo(() => toSeriesData(prepared), [prepared]);
 
   const fullMin = useMemo(
-    () => (prepared.length ? new Date(prepared[0].date).getTime() : Date.now()),
+    () => (prepared.length ? parseISO(prepared[0].date).getTime() : Date.now()),
     [prepared]
   );
   const fullMax = useMemo(
     () =>
       prepared.length
-        ? new Date(prepared[prepared.length - 1].date).getTime()
+        ? parseISO(prepared[prepared.length - 1].date).getTime()
         : Date.now(),
     [prepared]
   );

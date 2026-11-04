@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { formatViewerTimeZoneLabel } from "@/lib/format-date";
 import type { DateRange } from "@/types/common";
 
 import "react-day-picker/style.css";
@@ -270,7 +271,7 @@ export function WalmartDateRangeModal({
               <div className="mt-auto flex items-center justify-between border-t border-[#e5e7eb] px-5 py-3">
                 <div className="flex items-center gap-1.5 text-[11px] text-[#6b7280]">
                   <Globe className="h-3.5 w-3.5" />
-                  Pacific Standard Time (PST) - {format(new Date(), "MM/dd/yyyy hh:mm a")}
+                  {formatViewerTimeZoneLabel()} - {format(new Date(), "MM/dd/yyyy hh:mm a")}
                 </div>
                 <div className="flex items-center gap-3">
                   <button

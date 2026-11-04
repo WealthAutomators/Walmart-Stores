@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Minus } from "lucide-react";
 import * as echarts from "echarts";
+import { parseISO } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { computeWalmartGmvYDomain } from "@/lib/charts/walmart-chart-domain";
 import type { ChartPoint } from "@/lib/charts/downsample-series";
@@ -70,8 +71,8 @@ export function WalmartSalesChart({
   const fullExtent = useMemo(() => {
     if (!data.length) return { min: 0, max: 0 };
     return {
-      min: new Date(data[0].date).getTime(),
-      max: new Date(data[data.length - 1].date).getTime(),
+      min: parseISO(data[0].date).getTime(),
+      max: parseISO(data[data.length - 1].date).getTime(),
     };
   }, [data]);
 
