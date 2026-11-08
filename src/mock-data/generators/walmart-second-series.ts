@@ -94,7 +94,7 @@ export function generateWalmartSecondSeries(
 
     let raw = RAW_BASE_GMV * baseline * spikeMultiplier * weekly * (1 + jitter);
     if (progress >= 0.48 && progress < 0.64 && rand() > 0.92) {
-      raw = -40 - rand() * 90;
+      raw = rand() * 6;
     }
 
     rawGmvs.push(Math.round(raw * 100) / 100);
@@ -153,7 +153,7 @@ export function generateWalmartSecondSeries(
     flatIndices.forEach((idx) => {
       if (shapedIndices.has(idx)) return;
       scaledGmvs[idx] =
-        rand() > 0.88 ? -(20 + Math.floor(rand() * 80)) : Math.floor(rand() * 30);
+        rand() > 0.88 ? Math.floor(rand() * 4) : Math.floor(rand() * 30);
     });
 
     const shapedBudget = [...shapedIndices].reduce((s, i) => s + scaledGmvs[i], 0);
@@ -183,7 +183,7 @@ export function generateWalmartSecondSeries(
     }
 
     scaledGmvs = scaledGmvs.map((g, i) => {
-      const capped = Math.max(-180, Math.min(1520, Math.round(g * 100) / 100));
+      const capped = Math.max(0, Math.min(1520, Math.round(g * 100) / 100));
       if (i >= dayCount - 7) {
         return Math.round(g * 100) / 100;
       }
