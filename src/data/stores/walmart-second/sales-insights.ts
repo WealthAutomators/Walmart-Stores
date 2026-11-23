@@ -14,8 +14,8 @@ export const walmartSecondDataConfig: Omit<
   timeSeriesSeed: 42,
   timeSeriesProfile: "volatile-bursts",
   rangeStart: "2024-05-01",
-  rangeEnd: "2026-11-23",
-  targetSales: 304934.54,
+  rangeEnd: "2026-11-24",
+  targetSales: 307432.26,
 };
 
 function buildTableRows(
